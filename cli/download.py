@@ -271,8 +271,9 @@ def downloadApkForDevice(app_id, device_code_name, country_code, category_id, em
 
     login = accounts.login_for_device(device_code_name, email)
 
-    # if 'error' in login:
-    #     return {'error': login['error']}
+    if 'error' in login:
+        # raise login['error']
+        return {'error': login['error']}
 
     return _downloadAppApk(app_id, login, country_code, category_id)
 
@@ -306,7 +307,7 @@ def _downloadAppApk(app_id, login, country_code, category_id = 'UNKNOWN'):
     if 'api' in login:
         download_result['login_failed'] = False
 
-        print(f"--> Download APK for {app_id} on device {device_code_name} with account {email} for category {category_id}\n")
+        print(f"\n--> Download APK for {app_id} on device {device_code_name} with account {email} for category {category_id}\n")
 
         try:
             downloaded = readJsonFile(DOWNLOADED_FILE, DOWNLOADED_FILE_DEFAULT_KEYS)

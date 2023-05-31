@@ -76,7 +76,7 @@ Main() {
       ${BACKGROUND_MODE} \
       --user ${CONTAINER_USER} \
       --env-file .env \
-      --volume "${PWD}"/../data:/home/developer/workspace/data/scrapped \
+      --volume "${PWD}"/../../data:/home/developer/workspace/data/scrapped \
       --volume "${PWD}"/../report/data:/home/developer/workspace/data/report \
       --volume "${PWD}":/home/developer/workspace \
       "${IMAGE_NAME}" \

@@ -81,7 +81,7 @@ def login(device, email):
         echoSuccess(f"Logged-in successfully...")
         exit(0)
 
-    echoError(f"Failed login attempt...")
+    echoError(f"\nFailed login attempt...")
     exit(1)
 
 
@@ -235,21 +235,26 @@ def download_apk(app_id):
 @click.option("--email", default=None, help="The email for your device Google account")
 def download_device_apk(app_id, device, country_code, category_id, email):
     result = download.downloadApkForDevice(app_id, device, country_code, category_id, email)
-    print(result)
 
-    if 'error' in result:
+    if 'error' in result and type(result['error']) is not dict:
+        echoError(f"\n---> ERROR: {result['error']}")
+        exit(1)
+
+    if 'download_failed' in result and result['login_failed'] == True:
+        echoError(f"\n---> Failed to download APK for device {result['metadata']['device_code_name']} with email {result['metadata']['email']}")
         echoError(result['error'])
         exit(1)
 
     if 'login_failed' in result and result['login_failed'] == True:
-        echoError(f"Failed to login for device {result['metadata']['device_code_name']} with email {result['metadata']['email']}")
+        echoError(f"\n--> Failed to login for device {result['metadata']['device_code_name']} with email {result['metadata']['email']}")
         exit(1)
 
     if 'download_failed' in result and result['download_failed'] == True:
-        echoError(f"Failed to download APK for device {result['metadata']['device_code_name']} with email {result['metadata']['email']}")
+        echoError(f"\n---> Failed to download APK for device {result['metadata']['device_code_name']} with email {result['metadata']['email']}")
         exit(1)
 
-    echoSuccess('Downloaded successfully the App APK...')
+
+    echoSuccess('\n---> Downloaded successfully the App APK...\n')
     exit(0)
 
 @cli.command(help="Download all Apps APKs for the given category ID.")

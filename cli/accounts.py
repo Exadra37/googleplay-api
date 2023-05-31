@@ -33,7 +33,7 @@ def getAccounts():
 def getAccountsForDevice(device_code_name):
     accounts = getAccounts()
 
-    if device_code_name in accounts['by_device']:
+    if 'by_device' in accounts and  device_code_name in accounts['by_device']:
         return accounts['by_device'][device_code_name]['accounts']
 
     return None
@@ -41,7 +41,7 @@ def getAccountsForDevice(device_code_name):
 def getRandomAccountForDevice(device_code_name):
     accounts = getAccounts()
 
-    if device_code_name in accounts['by_device']:
+    if 'by_device' in accounts and  device_code_name in accounts['by_device']:
         device_accounts = accounts['by_device'][device_code_name]['accounts']
         email = random.choice(list(device_accounts))
         return device_accounts[email]
@@ -118,7 +118,7 @@ def login_for_device(device_code_name, email):
     accounts = getAccountsForDevice(device_code_name)
 
     if accounts is None:
-        message = f"Account not found for device code name: {device_code_name}"
+        message = f"Account not found for device code name {device_code_name} with email {email}"
         logger.error(message)
 
         return {
@@ -131,10 +131,8 @@ def login_for_device(device_code_name, email):
             }
         }
 
-    return {
-        "account": accounts[email],
-        "api": login(accounts[email])
-    }
+    return handle_login(accounts, email, device_code_name)
+
 
 def random_login(device_code_name = None):
     if not device_code_name == None:
@@ -160,11 +158,31 @@ def random_login(device_code_name = None):
 
     email = random.choice(list(accounts.keys()))
 
+    return handle_login(accounts, email, device_code_name)
+
+def handle_login(accounts, email, device_code_name):
+
+    print(f"\n---> Google account login for device {device_code_name} with email {email}")
+
+    api = login(accounts[email])
+
+    if api is False:
+        return {
+            "error": {
+                'message': f"\n ---> ERROR: Failed login for device {device_code_name} with email {email}",
+                'metadata': {
+                    'email': email,
+                    'device_code_name': device_code_name,
+                }
+            }
+        }
+
+    print(f"---> Logged in successfully with device {device_code_name} and email {email}")
+
     return {
         "account": accounts[email],
-        "api": login(accounts[email])
+        "api": api
     }
-
 
 def login(account):
     try:
